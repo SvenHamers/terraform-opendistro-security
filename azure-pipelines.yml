@@ -40,8 +40,6 @@ steps:
     repositoryName: '$(Build.Repository.Name)'
     action: 'create'
     target: '$(Build.SourceVersion)'
-    tagSource: 'gitTag'
-    tagPattern: '*'
+    tagSource: 'auto'
     changeLogCompareToRelease: 'lastFullRelease'
-    changeLogType: 'commitBased'
 
