@@ -36,13 +36,12 @@ steps:
 
 - task: GitHubRelease@1
   inputs:
-    gitHubConnection: 'github-opendistro'
+    gitHubConnection: 'github-con'
     repositoryName: '$(Build.Repository.Name)'
     action: 'create'
     target: '$(Build.SourceVersion)'
     tagSource: 'gitTag'
     changeLogCompareToRelease: 'lastFullRelease'
     changeLogType: 'commitBased'
-
 
 
