@@ -64,3 +64,5 @@ resource "opendistro_role_mapping" "example" {
 }
 
 ```
+
+.
