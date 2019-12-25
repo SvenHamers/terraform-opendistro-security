@@ -44,7 +44,7 @@ steps:
     action: 'create'
     target: '$(Build.SourceVersion)'
     tagSource: 'userSpecifiedTag'
-    tag: 'v0.0.1'
+    tag: '$(Version.Revision)'
     changeLogCompareToRelease: 'lastFullRelease'
     changeLogType: 'commitBased'
 
