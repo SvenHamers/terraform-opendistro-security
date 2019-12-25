@@ -29,6 +29,9 @@ steps:
 - script: |
     go version
     go mod download
-    go build -v .
+    go build -o $(Build.ArtifactStagingDirectory)/terraform-provider-opendistro
   workingDirectory: '$(modulePath)'
   displayName: 'Get dependencies, then build'
+
+
+
