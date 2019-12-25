@@ -1,5 +1,7 @@
 # Opendistro Security Terraform Provider
 
+[![Build Status](https://dev.azure.com/svenhamers/terraform-opendistro-security/_apis/build/status/SvenHamers.terraform-opendistro-security?branchName=master)](https://dev.azure.com/svenhamers/terraform-opendistro-security/_build/latest?definitionId=4&branchName=master)
+
 Work in progress
 
 ### working features:
