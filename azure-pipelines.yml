@@ -43,10 +43,7 @@ steps:
     repositoryName: 'SvenHamers/terraform-opendistro-security'
     action: 'create'
     target: '$(Build.SourceVersion)'
-    tagSource: 'userSpecifiedTag'
-    tag: '$(Version.Revision)'
+    tagSource: 'gitTag'
+    tagPattern: 'release-*'
     changeLogCompareToRelease: 'lastFullRelease'
     changeLogType: 'commitBased'
-
-
-
