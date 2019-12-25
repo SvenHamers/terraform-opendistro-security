@@ -34,4 +34,16 @@ steps:
   displayName: 'Get dependencies, then build'
 
 
+- task: GitHubRelease@1
+  inputs:
+    gitHubConnection: 'GitHub'
+    repositoryName: '$(Build.Repository.Name)'
+    action: 'create'
+    target: '$(Build.SourceVersion)'
+    tagSource: 'gitTag'
+    changeLogCompareToRelease: 'lastFullRelease'
+    changeLogType: 'commitBased'
+
+
+
 
