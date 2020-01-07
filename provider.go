@@ -37,7 +37,6 @@ func Provider() *schema.Provider {
 			"opendistro_role":         resourceRole(),
 			"opendistro_role_mapping": resourcerolemapping(),
 			"opendistro_tenant":       resourceTenant(),
-			"opendistro_action_group": resourceActionGroup(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"opendistro_health": dataSourceHealthCurrent(),
