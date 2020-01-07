@@ -73,6 +73,7 @@ func resourceUserCreate(d *schema.ResourceData, m interface{}) error {
 	if reqerr != nil {
 		log.Print(reqerr)
 	}
+
 	return resourceUserRead(d, m)
 }
 

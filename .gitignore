@@ -1,3 +1,11 @@
 
 .DS_Store
 go.sum
+
+*.tf
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/plugins/darwin_amd64/lock.json
+crash.log
+terraform-=provider-opendistro
+terraform-provider-opendistro
