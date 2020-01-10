@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/WhizUs/go-opendistro"
+	"github.com/SvenHamers/go-opendistro"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 

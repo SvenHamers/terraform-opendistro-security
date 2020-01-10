@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 
-	"github.com/WhizUs/go-opendistro"
-	"github.com/WhizUs/go-opendistro/security"
+	"github.com/SvenHamers/go-opendistro"
+	"github.com/SvenHamers/go-opendistro/security"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -56,7 +57,7 @@ func resourceUserCreate(d *schema.ResourceData, m interface{}) error {
 	client, err := opendistro.NewClient(m.(*opendistro.ClientConfig))
 
 	if err != nil {
-		log.Print(err)
+		return fmt.Errorf("error creating user")
 	}
 
 	rolesArr := []string{}
