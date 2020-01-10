@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 
 	"github.com/SvenHamers/go-opendistro"
 	"github.com/SvenHamers/go-opendistro/security"
@@ -56,11 +56,8 @@ func resourcerolemapping() *schema.Resource {
 func resourcerolemappingCreate(d *schema.ResourceData, m interface{}) error {
 
 	ctx := context.TODO()
-
-	client, err := opendistro.NewClient(m.(*opendistro.ClientConfig))
-	if err != nil {
-		log.Print(err)
-	}
+	name := d.Get("rolemapping_name").(string)
+	client, _ := opendistro.NewClient(m.(*opendistro.ClientConfig))
 
 	securityRoleMapping := &security.RoleMappingRelations{
 		BackendRoles: expandStringSet(d.Get("backend_roles").([]interface{})),
@@ -68,12 +65,11 @@ func resourcerolemappingCreate(d *schema.ResourceData, m interface{}) error {
 		Users:        expandStringSet(d.Get("hosts").([]interface{})),
 	}
 
-	reqerr := client.Security.Rolesmapping.Create(ctx, d.Get("rolemapping_name").(string), securityRoleMapping)
-	if reqerr != nil {
-		log.Print(reqerr)
+	err := client.Security.Rolesmapping.Create(ctx, name, securityRoleMapping)
+	if err != nil {
+		return fmt.Errorf("failed to create role mapping (%s): %s", name, err)
 	}
-
-	d.SetId(d.Get("rolemapping_name").(string))
+	d.SetId(name)
 	return resourcerolemappingRead(d, m)
 }
 
@@ -89,15 +85,12 @@ func resourcerolemappingUpdate(d *schema.ResourceData, m interface{}) error {
 func resourcerolemappingDelete(d *schema.ResourceData, m interface{}) error {
 
 	ctx := context.TODO()
+	name := d.Get("rolemapping_name").(string)
+	client, _ := opendistro.NewClient(m.(*opendistro.ClientConfig))
 
-	client, err := opendistro.NewClient(m.(*opendistro.ClientConfig))
+	err := client.Security.Rolesmapping.Delete(ctx, name)
 	if err != nil {
-		log.Print(err)
-	}
-
-	reqerr := client.Security.Rolesmapping.Delete(ctx, d.Get("rolemapping_name").(string))
-	if reqerr != nil {
-		log.Print(reqerr)
+		return fmt.Errorf("failed to delete role mapping (%s): %s", name, err)
 	}
 
 	return nil

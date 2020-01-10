@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 
 	"github.com/SvenHamers/go-opendistro"
 	"github.com/SvenHamers/go-opendistro/security"
@@ -118,25 +118,21 @@ func resourceRole() *schema.Resource {
 
 func resourceRoleCreate(d *schema.ResourceData, m interface{}) error {
 	ctx := context.TODO()
-
+	name := d.Get("role_name").(string)
 	rolePermission := &security.RolePermissions{
 		IndexPermissions:   expandIndexConfigRequest(d.Get("index_permissions").([]interface{})),
 		TenantPermissions:  expandTenantConfigRequest(d.Get("tenant_permissions").([]interface{})),
 		ClusterPermissions: expandStringSet(d.Get("cluster_permissions").([]interface{})),
 	}
 
-	client, err := opendistro.NewClient(m.(*opendistro.ClientConfig))
+	client, _ := opendistro.NewClient(m.(*opendistro.ClientConfig))
 
+	err := client.Security.Roles.Create(ctx, d.Get("role_name").(string), rolePermission)
 	if err != nil {
-		log.Print(err)
+		return fmt.Errorf("failed to create role (%s): %s", name, err)
 	}
 
-	reqerr := client.Security.Roles.Create(ctx, d.Get("role_name").(string), rolePermission)
-	if reqerr != nil {
-		log.Print(reqerr)
-	}
-
-	d.SetId(d.Get("role_name").(string))
+	d.SetId(name)
 	return resourceRoleRead(d, m)
 }
 
@@ -152,16 +148,12 @@ func resourceRoleUpdate(d *schema.ResourceData, m interface{}) error {
 func resourceRoleDelete(d *schema.ResourceData, m interface{}) error {
 
 	ctx := context.TODO()
+	name := d.Get("role_name").(string)
+	client, _ := opendistro.NewClient(m.(*opendistro.ClientConfig))
 
-	client, err := opendistro.NewClient(m.(*opendistro.ClientConfig))
-
+	err := client.Security.Roles.Delete(ctx, d.Get("role_name").(string))
 	if err != nil {
-		log.Print(err)
-	}
-
-	reqerr := client.Security.Roles.Delete(ctx, d.Get("role_name").(string))
-	if reqerr != nil {
-		log.Print(reqerr)
+		return fmt.Errorf("failed to delete role (%s): %s", name, err)
 	}
 
 	return nil

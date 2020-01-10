@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/SvenHamers/go-opendistro"
 	"github.com/SvenHamers/go-opendistro/security"
@@ -16,6 +17,12 @@ func resourceUser() *schema.Resource {
 		Read:   resourceUserRead,
 		Update: resourceUserUpdate,
 		Delete: resourceUserDelete,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(1 * time.Minute),
+			Update: schema.DefaultTimeout(1 * time.Minute),
+			Delete: schema.DefaultTimeout(1 * time.Minute),
+		},
 
 		Schema: map[string]*schema.Schema{
 			"user_id": &schema.Schema{
@@ -57,14 +64,9 @@ func resourceUser() *schema.Resource {
 func resourceUserCreate(d *schema.ResourceData, m interface{}) error {
 
 	ctx := context.TODO()
+	name := d.Get("user_name").(string)
 
-	d.SetId(d.Get("user_name").(string))
-
-	client, err := opendistro.NewClient(m.(*opendistro.ClientConfig))
-
-	if err != nil {
-		return fmt.Errorf("error creating user")
-	}
+	client, _ := opendistro.NewClient(m.(*opendistro.ClientConfig))
 
 	user := &security.UserCreate{
 		Password:        d.Get("password").(string),
@@ -72,10 +74,12 @@ func resourceUserCreate(d *schema.ResourceData, m interface{}) error {
 		OpenDistroRoles: expandStringSet(d.Get("opendistro_roles").([]interface{})),
 	}
 
-	reqerr := client.Security.Users.Create(ctx, d.Get("user_name").(string), user)
-	if reqerr != nil {
-		log.Print(reqerr)
+	err := client.Security.Users.Create(ctx, name, user)
+	if err != nil {
+		return fmt.Errorf("failed to create user (%s): %s", name, err)
 	}
+
+	d.SetId(name)
 
 	return resourceUserRead(d, m)
 }

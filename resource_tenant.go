@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 
 	"github.com/SvenHamers/go-opendistro"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -28,18 +28,16 @@ func resourceTenant() *schema.Resource {
 func resourceTenantCreate(d *schema.ResourceData, m interface{}) error {
 	ctx := context.TODO()
 
-	client, err := opendistro.NewClient(m.(*opendistro.ClientConfig))
+	name := d.Get("name").(string)
 
+	client, _ := opendistro.NewClient(m.(*opendistro.ClientConfig))
+
+	err := client.Security.Tenants.Create(ctx, name)
 	if err != nil {
-		log.Print(err)
+		return fmt.Errorf("failed to create tenant (%s): %s", name, err)
 	}
 
-	reqerr := client.Security.Tenants.Create(ctx, d.Get("name").(string))
-	if reqerr != nil {
-		log.Print(reqerr)
-	}
-
-	d.SetId(d.Get("name").(string))
+	d.SetId(name)
 
 	return resourceTenantRead(d, m)
 }
@@ -51,16 +49,13 @@ func resourceTenantRead(d *schema.ResourceData, m interface{}) error {
 
 func resourceTenantDelete(d *schema.ResourceData, m interface{}) error {
 	ctx := context.TODO()
+	name := d.Get("name").(string)
+	client, _ := opendistro.NewClient(m.(*opendistro.ClientConfig))
 
-	client, err := opendistro.NewClient(m.(*opendistro.ClientConfig))
+	err := client.Security.Tenants.Delete(ctx, name)
 
 	if err != nil {
-		log.Print(err)
-	}
-
-	reqerr := client.Security.Tenants.Delete(ctx, d.Get("name").(string))
-	if reqerr != nil {
-		log.Print(reqerr)
+		return fmt.Errorf("failed to delete tenant (%s): %s", name, err)
 	}
 
 	return nil
