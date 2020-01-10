@@ -7,8 +7,7 @@ trigger:
 - master
   
 
-pool:
-  vmImage: 'ubuntu-latest'
+
 
 variables:
   GOBIN:  '$(GOPATH)/bin' # Go binaries path
@@ -18,32 +17,55 @@ variables:
   Version.MajorMinor: 0.0
   Version.Revision: $[counter(variables['Version.MajorMinor'], 0)]
 
-steps:
-- script: |
-    mkdir -p '$(GOBIN)'
-    mkdir -p '$(GOPATH)/pkg'
-    mkdir -p '$(modulePath)'
-    shopt -s extglob
-    shopt -s dotglob
-    mv !(gopath) '$(modulePath)'
-    echo '##vso[task.prependpath]$(GOBIN)'
-  displayName: 'Set up the Go workspace'
+jobs:
+- job: buildlinux
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - script: |
+      mkdir -p '$(GOBIN)'
+      mkdir -p '$(GOPATH)/pkg'
+      mkdir -p '$(modulePath)'
+      shopt -s extglob
+      shopt -s dotglob
+      mv !(gopath) '$(modulePath)'
+      echo '##vso[task.prependpath]$(GOBIN)'
+    displayName: 'Set up the Go workspace'
+  - script: |
+      go version
+      go mod download
+      mkdir $(Build.ArtifactStagingDirectory)/linux
+      go build -o $(Build.ArtifactStagingDirectory)/terraform-provider-opendistro
+    workingDirectory: '$(modulePath)'
+    displayName: 'Get dependencies, then build'
 
-- script: |
-    go version
-    go mod download
-    go build -o $(Build.ArtifactStagingDirectory)/terraform-provider-opendistro
-  workingDirectory: '$(modulePath)'
-  displayName: 'Get dependencies, then build'
+- job: buildmac
+  pool:
+    vmImage: 'macOS-10.14'
+  steps:
+  - script: |
+      mkdir -p '$(GOBIN)'
+      mkdir -p '$(GOPATH)/pkg'
+      mkdir -p '$(modulePath)'
+      shopt -s extglob
+      shopt -s dotglob
+      mv !(gopath) '$(modulePath)'
+      echo '##vso[task.prependpath]$(GOBIN)'
+    displayName: 'Set up the Go workspace'
+  - script: |
+      go version
+      go mod download
+      mkdir $(Build.ArtifactStagingDirectory)/mac
+      go build -o $(Build.ArtifactStagingDirectory)/mac/terraform-provider-opendistro
+    workingDirectory: '$(modulePath)'
+    displayName: 'Get dependencies, then build'
 
 
-- task: GitHubRelease@1
-  inputs:
-    gitHubConnection: 'github-con'
-    repositoryName: 'SvenHamers/terraform-opendistro-security'
-    action: 'create'
-    target: '$(Build.SourceVersion)'
-    tagSource: 'gitTag'
-    tagPattern: 'release-*'
-    changeLogCompareToRelease: 'lastFullRelease'
-    changeLogType: 'commitBased'
+
+
+
+
+
+
+
+
