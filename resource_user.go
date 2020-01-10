@@ -38,6 +38,12 @@ func resourceUser() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				ForceNew: true,
 			},
+			"opendistro_roles": &schema.Schema{
+				Type:     schema.TypeList,
+				Required: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				ForceNew: true,
+			},
 			"attributes": {
 				Type:     schema.TypeMap,
 				Optional: true,
@@ -60,14 +66,10 @@ func resourceUserCreate(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("error creating user")
 	}
 
-	rolesArr := []string{}
-	for _, element := range d.Get("backend_roles").([]interface{}) {
-		rolesArr = append(rolesArr, element.(string))
-	}
-
 	user := &security.UserCreate{
-		Password:     d.Get("password").(string),
-		BackendRoles: rolesArr,
+		Password:        d.Get("password").(string),
+		BackendRoles:    expandStringSet(d.Get("backend_roles").([]interface{})),
+		OpenDistroRoles: expandStringSet(d.Get("opendistro_roles").([]interface{})),
 	}
 
 	reqerr := client.Security.Users.Create(ctx, d.Get("user_name").(string), user)
