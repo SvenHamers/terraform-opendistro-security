@@ -62,7 +62,7 @@ func resourcerolemappingCreate(d *schema.ResourceData, m interface{}) error {
 	securityRoleMapping := &security.RoleMappingRelations{
 		BackendRoles: expandStringSet(d.Get("backend_roles").([]interface{})),
 		Hosts:        expandStringSet(d.Get("hosts").([]interface{})),
-		Users:        expandStringSet(d.Get("hosts").([]interface{})),
+		Users:        expandStringSet(d.Get("users").([]interface{})),
 	}
 
 	err := client.Security.Rolesmapping.Create(ctx, name, securityRoleMapping)
